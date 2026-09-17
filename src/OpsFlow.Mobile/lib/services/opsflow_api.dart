@@ -5,7 +5,13 @@ import 'package:http/http.dart' as http;
 import '../models/ticket.dart';
 
 class OpsFlowApi {
-  OpsFlowApi({http.Client? client, this.baseUrl = 'http://10.0.2.2:5188'}) : _client = client ?? http.Client();
+  OpsFlowApi({http.Client? client, String? baseUrl})
+      : _client = client ?? http.Client(),
+        baseUrl = baseUrl ?? _defaultBaseUrl;
+
+  static const _defaultBaseUrl = bool.fromEnvironment('dart.library.html')
+      ? 'http://127.0.0.1:5188'
+      : 'http://10.0.2.2:5188';
 
   final http.Client _client;
   final String baseUrl;
