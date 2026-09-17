@@ -9,6 +9,8 @@ This is a portfolio project focused on practical software architecture: a clear 
 - Create and list support tickets.
 - Validate ticket title and description.
 - Track priority and status (`Open`, `InProgress`, `Resolved`, `Closed`).
+- Associate a ticket with an operational asset and technician.
+- Keep data after restarting the API with SQLite persistence.
 - Filter tickets by status through the API.
 - Update a ticket status from the dashboard.
 - Health endpoint and OpenAPI document.
@@ -18,9 +20,9 @@ This is a portfolio project focused on practical software architecture: a clear 
 
 - **Backend:** ASP.NET Core, C# and .NET 9.
 - **Dashboard:** React, Vite and responsive CSS.
+- **Mobile:** Flutter and Dart technician client.
+- **Persistence:** SQLite for the local MVP, with PostgreSQL planned for deployment.
 - **Testing:** xUnit.
-- **Planned mobile client:** Flutter and Dart.
-- **Planned persistence:** PostgreSQL.
 
 ## Architecture
 
@@ -49,10 +51,11 @@ Then open `http://127.0.0.1:5173/` in a browser.
 - [x] Document the initial domain and architecture.
 - [x] Create the ASP.NET Core API skeleton.
 - [x] Add the ticket workflow and dashboard.
+- [x] Add asset association, assignment and SQLite persistence.
+- [x] Add the first Flutter technician client.
 - [x] Add automated tests and a CI workflow.
 - [ ] Replace temporary storage with PostgreSQL.
 - [ ] Add authentication and roles.
-- [ ] Connect the Flutter technician app.
 - [ ] Deploy a safe public demo with sample data.
 
 ## Run the API
@@ -67,6 +70,18 @@ Useful endpoints:
 - `GET /api/tickets`
 - `POST /api/tickets`
 - `PATCH /api/tickets/{id}/status`
+- `PATCH /api/tickets/{id}/assignment`
+- `GET /api/assets`
+
+## Run the Flutter client
+
+The mobile client uses `10.0.2.2` when running on an Android emulator, which maps to the host machine. For a physical device, replace `baseUrl` in `src/OpsFlow.Mobile/lib/services/opsflow_api.dart` with the computer's local network address.
+
+```bash
+cd src/OpsFlow.Mobile
+flutter pub get
+flutter run
+```
 
 Run the tests with:
 

@@ -33,7 +33,7 @@ public sealed class TicketsController(ITicketStore ticketStore) : ControllerBase
             return BadRequest(new { error = "Description is required." });
         }
 
-        var ticket = ticketStore.Add(request.Title.Trim(), request.Description.Trim(), request.Priority);
+        var ticket = ticketStore.Add(request.Title.Trim(), request.Description.Trim(), request.Priority, request.AssetId, request.Assignee?.Trim());
         return CreatedAtAction(nameof(Get), new { id = ticket.Id }, ticket);
     }
 
@@ -41,6 +41,13 @@ public sealed class TicketsController(ITicketStore ticketStore) : ControllerBase
     public ActionResult<Ticket> ChangeStatus(Guid id, ChangeTicketStatusRequest request)
     {
         var ticket = ticketStore.ChangeStatus(id, request.Status);
+        return ticket is null ? NotFound() : Ok(ticket);
+    }
+
+    [HttpPatch("{id:guid}/assignment")]
+    public ActionResult<Ticket> ChangeAssignment(Guid id, ChangeTicketAssignmentRequest request)
+    {
+        var ticket = ticketStore.ChangeAssignment(id, request.AssetId, request.Assignee?.Trim());
         return ticket is null ? NotFound() : Ok(ticket);
     }
 }

@@ -15,6 +15,9 @@ obj/
 .vs/
 *.user
 *.suo
+*.db
+*.db-shm
+*.db-wal
 
 # Node
 node_modules/

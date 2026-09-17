@@ -20,18 +20,23 @@ const priorityLabels = {
 
 function App() {
   const [tickets, setTickets] = useState([])
+  const [assets, setAssets] = useState([])
   const [apiOnline, setApiOnline] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [form, setForm] = useState({ title: '', description: '', priority: 'Medium' })
+  const [form, setForm] = useState({ title: '', description: '', priority: 'Medium', assetId: '', assignee: '' })
 
   const loadTickets = useCallback(async () => {
     setLoading(true)
     try {
-      const response = await fetch(`${API_URL}/api/tickets`)
-      if (!response.ok) throw new Error('No se pudo consultar la API')
-      setTickets(await response.json())
+      const [ticketsResponse, assetsResponse] = await Promise.all([
+        fetch(`${API_URL}/api/tickets`),
+        fetch(`${API_URL}/api/assets`),
+      ])
+      if (!ticketsResponse.ok || !assetsResponse.ok) throw new Error('No se pudo consultar la API')
+      setTickets(await ticketsResponse.json())
+      setAssets(await assetsResponse.json())
       setApiOnline(true)
       setError('')
     } catch {
@@ -53,6 +58,8 @@ function App() {
     closed: tickets.filter((ticket) => ['Resolved', 'Closed'].includes(ticket.status)).length,
   }), [tickets])
 
+  const assetMap = useMemo(() => new Map(assets.map((asset) => [asset.id, asset])), [assets])
+
   function updateField(event) {
     setForm((current) => ({ ...current, [event.target.name]: event.target.value }))
   }
@@ -68,7 +75,7 @@ function App() {
         body: JSON.stringify(form),
       })
       if (!response.ok) throw new Error('No se pudo crear el ticket')
-      setForm({ title: '', description: '', priority: 'Medium' })
+      setForm({ title: '', description: '', priority: 'Medium', assetId: '', assignee: '' })
       await loadTickets()
     } catch {
       setError('No se pudo guardar el ticket. Verifica que la API esté activa.')
@@ -99,7 +106,7 @@ function App() {
         <nav>
           <a className="nav-item active" href="#resumen">▦ <span>Resumen</span></a>
           <a className="nav-item" href="#tickets">◫ <span>Tickets</span><b>{stats.total}</b></a>
-          <a className="nav-item" href="#activos">▣ <span>Activos</span></a>
+          <a className="nav-item" href="#activos">▣ <span>Activos</span><b>{assets.length}</b></a>
           <a className="nav-item" href="#reportes">◒ <span>Reportes</span></a>
         </nav>
         <div className="sidebar-footer"><span className={apiOnline ? 'dot online' : 'dot'} /> {apiOnline ? 'API conectada' : 'API desconectada'}</div>
@@ -123,7 +130,7 @@ function App() {
         <section className="content-grid">
           <article id="tickets" className="panel tickets-panel">
             <div className="panel-heading"><div><p className="eyebrow">SEGUIMIENTO</p><h2>Tickets recientes</h2></div><button className="ghost-button" onClick={loadTickets}>Actualizar</button></div>
-            {loading ? <div className="empty-state">Cargando tickets...</div> : tickets.length === 0 ? <div className="empty-state"><div className="empty-icon">◫</div><h3>No hay tickets todavía</h3><p>Crea el primero desde el formulario para ver cómo funciona el flujo.</p></div> : <div className="ticket-list">{tickets.map((ticket) => <div className="ticket-row" key={ticket.id}><div className="ticket-main"><span className={`priority priority-${ticket.priority.toLowerCase()}`} /> <div><strong>{ticket.title}</strong><p>{ticket.description}</p></div></div><div className="ticket-meta"><span className={`status status-${ticket.status.toLowerCase()}`}>{statusLabels[ticket.status]}</span><select value={ticket.status} onChange={(event) => changeStatus(ticket.id, event.target.value)} aria-label={`Estado de ${ticket.title}`}>{statuses.map((status) => <option key={status} value={status}>{statusLabels[status]}</option>)}</select></div></div>)}</div>}
+            {loading ? <div className="empty-state">Cargando tickets...</div> : tickets.length === 0 ? <div className="empty-state"><div className="empty-icon">◫</div><h3>No hay tickets todavía</h3><p>Crea el primero desde el formulario para ver cómo funciona el flujo.</p></div> : <div className="ticket-list">{tickets.map((ticket) => <div className="ticket-row" key={ticket.id}><div className="ticket-main"><span className={`priority priority-${ticket.priority.toLowerCase()}`} /> <div><strong>{ticket.title}</strong><p>{ticket.description}</p><small>{ticket.assignee ? `Asignado a ${ticket.assignee}` : 'Sin técnico asignado'}{ticket.assetId && assetMap.get(ticket.assetId) ? ` · ${assetMap.get(ticket.assetId).name}` : ''}</small></div></div><div className="ticket-meta"><span className={`status status-${ticket.status.toLowerCase()}`}>{statusLabels[ticket.status]}</span><select value={ticket.status} onChange={(event) => changeStatus(ticket.id, event.target.value)} aria-label={`Estado de ${ticket.title}`}>{statuses.map((status) => <option key={status} value={status}>{statusLabels[status]}</option>)}</select></div></div>)}</div>}
           </article>
 
           <article className="panel create-panel">
@@ -132,6 +139,8 @@ function App() {
               <label>Título<input name="title" value={form.title} onChange={updateField} placeholder="Ej. Laptop no enciende" required /></label>
               <label>Descripción<textarea name="description" value={form.description} onChange={updateField} placeholder="Describe brevemente el problema" rows="4" required /></label>
               <label>Prioridad<select name="priority" value={form.priority} onChange={updateField}>{priorities.map((priority) => <option key={priority} value={priority}>{priorityLabels[priority]}</option>)}</select></label>
+              <label>Asignar a (opcional)<input name="assignee" value={form.assignee} onChange={updateField} placeholder="Ej. Ana Torres" /></label>
+              <label>Activo afectado<select name="assetId" value={form.assetId} onChange={updateField}><option value="">Sin activo asociado</option>{assets.map((asset) => <option key={asset.id} value={asset.id}>{asset.name} · {asset.serialNumber}</option>)}</select></label>
               <button className="primary-button" type="submit" disabled={saving || !apiOnline}>{saving ? 'Guardando...' : 'Crear ticket'} <span>→</span></button>
             </form>
           </article>

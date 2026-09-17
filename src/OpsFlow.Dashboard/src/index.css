@@ -27,3 +27,4 @@ button { cursor: pointer; }
 footer { padding: 22px 0 0; color: #98a2b3; text-align: center; font-size: 11px; }
 @media (max-width: 980px) { .stats-grid { grid-template-columns: repeat(2, 1fr); }.content-grid { grid-template-columns: 1fr; } }
 @media (max-width: 680px) { .sidebar { width: 62px; padding: 20px 9px; }.brand { padding: 0 6px 40px; }.brand > span:last-child, .workspace-label, .nav-item span, .nav-item b, .sidebar-footer { display: none; }.nav-item { justify-content: center; padding: 12px 6px; }.main-content { padding: 25px 16px; }.stats-grid { gap: 10px; }.stat-card { padding: 14px; gap: 9px; }.stat-card strong { font-size: 23px; }.stat-card span { font-size: 11px; }.ticket-row { align-items: flex-start; flex-direction: column; }.ticket-meta { width: 100%; justify-content: flex-end; }.ticket-main p { max-width: 230px; } }
+.ticket-main small { display: block; margin-top: 7px; color: #98a2b3; font-size: 11px; }

@@ -16,6 +16,13 @@ public enum TicketPriority
     Critical
 }
 
+public sealed record Asset(
+    Guid Id,
+    string Name,
+    string SerialNumber,
+    string Location,
+    string Status);
+
 public sealed record Ticket(
     Guid Id,
     string Title,
@@ -23,4 +30,6 @@ public sealed record Ticket(
     TicketPriority Priority,
     TicketStatus Status,
     DateTimeOffset CreatedAt,
-    DateTimeOffset UpdatedAt);
+    DateTimeOffset UpdatedAt,
+    Guid? AssetId = null,
+    string? Assignee = null);

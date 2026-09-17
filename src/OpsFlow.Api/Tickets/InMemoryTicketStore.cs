@@ -16,10 +16,10 @@ public sealed class InMemoryTicketStore : ITicketStore
 
     public Ticket? Get(Guid id) => tickets.TryGetValue(id, out var ticket) ? ticket : null;
 
-    public Ticket Add(string title, string description, TicketPriority priority)
+    public Ticket Add(string title, string description, TicketPriority priority, Guid? assetId = null, string? assignee = null)
     {
         var now = DateTimeOffset.UtcNow;
-        var ticket = new Ticket(Guid.NewGuid(), title, description, priority, TicketStatus.Open, now, now);
+        var ticket = new Ticket(Guid.NewGuid(), title, description, priority, TicketStatus.Open, now, now, assetId, assignee);
         tickets[ticket.Id] = ticket;
         return ticket;
     }
@@ -29,6 +29,20 @@ public sealed class InMemoryTicketStore : ITicketStore
         while (tickets.TryGetValue(id, out var current))
         {
             var updated = current with { Status = status, UpdatedAt = DateTimeOffset.UtcNow };
+            if (tickets.TryUpdate(id, updated, current))
+            {
+                return updated;
+            }
+        }
+
+        return null;
+    }
+
+    public Ticket? ChangeAssignment(Guid id, Guid? assetId, string? assignee)
+    {
+        while (tickets.TryGetValue(id, out var current))
+        {
+            var updated = current with { AssetId = assetId, Assignee = assignee, UpdatedAt = DateTimeOffset.UtcNow };
             if (tickets.TryUpdate(id, updated, current))
             {
                 return updated;

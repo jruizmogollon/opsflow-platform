@@ -4,6 +4,10 @@
 
 The first release will be a modular monolith. This keeps deployment and debugging simple while the domain boundaries remain explicit. If a module later needs to scale or deploy independently, it can be extracted with less risk.
 
+## Current implementation
+
+The API currently uses SQLite so the local demo keeps its data after a restart. Storage is hidden behind `ITicketStore`, which keeps a future PostgreSQL migration contained in the infrastructure layer. A React dashboard serves supervisors and a Flutter client provides a small technician-facing view.
+
 ## Main modules
 
 - **Identity:** users, roles and organization membership.
@@ -18,6 +22,12 @@ The first release will be a modular monolith. This keeps deployment and debuggin
 - **Administrator:** manages the organization and users.
 - **Supervisor:** creates, assigns and monitors tickets.
 - **Technician:** works on assigned tickets and updates their progress.
+
+## Operational relationships
+
+- A ticket may be assigned to one technician.
+- A ticket may reference one asset, such as a laptop, printer or router.
+- The asset inventory stays separate from the ticket workflow so it can grow into a useful module instead of becoming free text in every ticket.
 
 ## First flow
 

@@ -1,4 +1,6 @@
 using OpsFlow.Api.Tickets;
+using Microsoft.EntityFrameworkCore;
+using OpsFlow.Api.Persistence;
 
 namespace OpsFlow.Api.Tests;
 
@@ -39,5 +41,39 @@ public sealed class InMemoryTicketStoreTests
         var updated = store.ChangeStatus(Guid.NewGuid(), TicketStatus.Closed);
 
         Assert.Null(updated);
+    }
+
+    [Fact]
+    public void Sqlite_store_keeps_a_ticket_after_context_is_recreated()
+    {
+        var databasePath = Path.Combine(Path.GetTempPath(), $"opsflow-{Guid.NewGuid():N}.db");
+        var options = new DbContextOptionsBuilder<OpsFlowDbContext>()
+            .UseSqlite($"Data Source={databasePath};Pooling=False")
+            .Options;
+
+        try
+        {
+            Guid ticketId;
+            using (var firstContext = new OpsFlowDbContext(options))
+            {
+                firstContext.Database.EnsureCreated();
+                ticketId = new SqliteTicketStore(firstContext)
+                    .Add("Persisted ticket", "Stored in SQLite", TicketPriority.Low).Id;
+            }
+
+            using (var secondContext = new OpsFlowDbContext(options))
+            {
+                var persisted = new SqliteTicketStore(secondContext).Get(ticketId);
+
+                Assert.NotNull(persisted);
+                Assert.Equal("Persisted ticket", persisted!.Title);
+            }
+        }
+        finally
+        {
+            File.Delete(databasePath);
+            File.Delete($"{databasePath}-shm");
+            File.Delete($"{databasePath}-wal");
+        }
     }
 }
