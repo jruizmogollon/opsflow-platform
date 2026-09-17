@@ -294,7 +294,7 @@ export default function App() {
         {activeSection === '#tickets' && <TicketsView tickets={tickets} assets={assets} assetMap={assetMap} form={form} setForm={setForm} onCreate={createTicket} onChangeStatus={changeStatus} saving={saving} />}
         {activeSection === '#activos' && <AssetsView assets={assets} />}
         {activeSection === '#reportes' && <ReportsView tickets={tickets} assets={assets} />}
-        <footer>OpsFlow Platform · Operations workspace · React + Flutter + ASP.NET Core + SQLite</footer>
+        <footer>OpsFlow Platform · Sistema de gestión · React + Flutter + ASP.NET Core + SQLite</footer>
       </main>
     </div>
   )

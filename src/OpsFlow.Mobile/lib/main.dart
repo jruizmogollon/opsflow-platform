@@ -72,6 +72,13 @@ class TicketCard extends StatelessWidget {
   final Ticket ticket;
   final VoidCallback onChanged;
 
+  String statusLabel(TicketStatus status) => switch (status) {
+        TicketStatus.open => 'Abierto',
+        TicketStatus.inProgress => 'En curso',
+        TicketStatus.resolved => 'Resuelto',
+        TicketStatus.closed => 'Cerrado',
+      };
+
   @override
   Widget build(BuildContext context) => Card(
         margin: const EdgeInsets.only(bottom: 12),
@@ -85,7 +92,7 @@ class TicketCard extends StatelessWidget {
           trailing: DropdownButton<TicketStatus>(
             value: ticket.status,
             underline: const SizedBox.shrink(),
-            items: TicketStatus.values.map((status) => DropdownMenuItem(value: status, child: Text(status.name))).toList(),
+            items: TicketStatus.values.map((status) => DropdownMenuItem(value: status, child: Text(statusLabel(status)))).toList(),
             onChanged: (status) async {
               if (status == null || status == ticket.status) return;
               await OpsFlowApi().updateStatus(ticket.id, status);

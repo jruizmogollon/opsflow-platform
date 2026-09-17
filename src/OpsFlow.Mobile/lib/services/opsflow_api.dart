@@ -18,7 +18,7 @@ class OpsFlowApi {
 
   Future<List<Ticket>> getTickets() async {
     final response = await _client.get(Uri.parse('$baseUrl/api/tickets'));
-    if (response.statusCode != 200) throw Exception('Could not load tickets');
+    if (response.statusCode != 200) throw Exception('No se pudieron cargar los tickets');
     final data = jsonDecode(response.body) as List<dynamic>;
     return data.map((item) => Ticket.fromJson(item as Map<String, dynamic>)).toList();
   }
@@ -29,6 +29,6 @@ class OpsFlowApi {
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'status': status.name[0].toUpperCase() + status.name.substring(1)}),
     );
-    if (response.statusCode != 200) throw Exception('Could not update ticket');
+    if (response.statusCode != 200) throw Exception('No se pudo actualizar el ticket');
   }
 }
