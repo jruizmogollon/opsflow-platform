@@ -114,7 +114,7 @@ function App() {
 
       <main className="main-content">
         <header className="topbar">
-          <div><p className="eyebrow">OPERACIONES / SOPORTE</p><h1>Resumen</h1></div>
+          <div><p className="eyebrow">OPERACIONES / SOPORTE</p><h1>Resumen</h1><div className="product-badge"><span className="pulse-dot" /> Web + Flutter · SQLite activa</div></div>
           <div className="user-chip"><span className="avatar">JR</span><span>José Ruiz</span><span className="chevron">⌄</span></div>
         </header>
 
@@ -125,6 +125,7 @@ function App() {
           <article className="stat-card"><div className="stat-icon amber">!</div><div><span>Abiertos</span><strong>{stats.open}</strong><small>Requieren atención</small></div></article>
           <article className="stat-card"><div className="stat-icon blue">↗</div><div><span>En progreso</span><strong>{stats.progress}</strong><small>En trabajo</small></div></article>
           <article className="stat-card"><div className="stat-icon green">✓</div><div><span>Resueltos</span><strong>{stats.closed}</strong><small>Completados</small></div></article>
+          <article className="stat-card"><div className="stat-icon violet">▣</div><div><span>Activos</span><strong>{assets.length}</strong><small>Equipos registrados</small></div></article>
         </section>
 
         <section className="content-grid">
@@ -146,7 +147,12 @@ function App() {
           </article>
         </section>
 
-        <footer>OpsFlow Platform · MVP de demostración · API ASP.NET Core + Dashboard React</footer>
+        <section id="activos" className="panel assets-panel">
+          <div className="panel-heading"><div><p className="eyebrow">INVENTARIO OPERATIVO</p><h2>Activos registrados</h2></div><span className="asset-count">{assets.length} activos</span></div>
+          <div className="asset-grid">{assets.map((asset) => <div className="asset-card" key={asset.id}><div className="asset-icon">▣</div><div><strong>{asset.name}</strong><p>{asset.serialNumber} · {asset.location}</p></div><span className={`asset-status ${asset.status.toLowerCase()}`}>{asset.status === 'Available' ? 'Disponible' : 'Mantenimiento'}</span></div>)}</div>
+        </section>
+
+        <footer>OpsFlow Platform · Operations workspace · React + Flutter + ASP.NET Core + SQLite</footer>
       </main>
     </div>
   )
