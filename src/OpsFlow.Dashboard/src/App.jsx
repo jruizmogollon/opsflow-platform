@@ -18,6 +18,13 @@ const priorityLabels = {
   Critical: 'Crítica',
 }
 
+const sectionTitles = {
+  '#resumen': 'Resumen',
+  '#tickets': 'Tickets',
+  '#activos': 'Activos',
+  '#reportes': 'Reportes',
+}
+
 function App() {
   const [tickets, setTickets] = useState([])
   const [assets, setAssets] = useState([])
@@ -25,6 +32,8 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const initialSection = sectionTitles[window.location.hash] ? window.location.hash : '#resumen'
+  const [activeSection, setActiveSection] = useState(initialSection)
   const [form, setForm] = useState({ title: '', description: '', priority: 'Medium', assetId: '', assignee: '' })
 
   const loadTickets = useCallback(async () => {
@@ -50,6 +59,18 @@ function App() {
   useEffect(() => {
     loadTickets()
   }, [loadTickets])
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const nextSection = sectionTitles[window.location.hash] ? window.location.hash : '#resumen'
+      setActiveSection(nextSection)
+      document.querySelector(nextSection)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+
+    window.addEventListener('hashchange', handleHashChange)
+    if (window.location.hash) window.setTimeout(handleHashChange, 0)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
 
   const stats = useMemo(() => ({
     total: tickets.length,
@@ -104,17 +125,17 @@ function App() {
         <div className="brand"><span className="brand-mark">O</span><span>OpsFlow</span></div>
         <p className="workspace-label">ESPACIO DE TRABAJO</p>
         <nav>
-          <a className="nav-item active" href="#resumen">▦ <span>Resumen</span></a>
-          <a className="nav-item" href="#tickets">◫ <span>Tickets</span><b>{stats.total}</b></a>
-          <a className="nav-item" href="#activos">▣ <span>Activos</span><b>{assets.length}</b></a>
-          <a className="nav-item" href="#reportes">◒ <span>Reportes</span></a>
+          <a className={`nav-item ${activeSection === '#resumen' ? 'active' : ''}`} href="#resumen">▦ <span>Resumen</span></a>
+          <a className={`nav-item ${activeSection === '#tickets' ? 'active' : ''}`} href="#tickets">◫ <span>Tickets</span><b>{stats.total}</b></a>
+          <a className={`nav-item ${activeSection === '#activos' ? 'active' : ''}`} href="#activos">▣ <span>Activos</span><b>{assets.length}</b></a>
+          <a className={`nav-item ${activeSection === '#reportes' ? 'active' : ''}`} href="#reportes">◒ <span>Reportes</span></a>
         </nav>
         <div className="sidebar-footer"><span className={apiOnline ? 'dot online' : 'dot'} /> {apiOnline ? 'API conectada' : 'API desconectada'}</div>
       </aside>
 
       <main className="main-content">
         <header className="topbar">
-          <div><p className="eyebrow">OPERACIONES / SOPORTE</p><h1>Resumen</h1><div className="product-badge"><span className="pulse-dot" /> Web + Flutter · SQLite activa</div></div>
+          <div><p className="eyebrow">OPERACIONES / SOPORTE</p><h1>{sectionTitles[activeSection]}</h1><div className="product-badge"><span className="pulse-dot" /> Web + Flutter · SQLite activa</div></div>
           <div className="user-chip"><span className="avatar">JR</span><span>José Ruiz</span><span className="chevron">⌄</span></div>
         </header>
 
@@ -150,6 +171,11 @@ function App() {
         <section id="activos" className="panel assets-panel">
           <div className="panel-heading"><div><p className="eyebrow">INVENTARIO OPERATIVO</p><h2>Activos registrados</h2></div><span className="asset-count">{assets.length} activos</span></div>
           <div className="asset-grid">{assets.map((asset) => <div className="asset-card" key={asset.id}><div className="asset-icon">▣</div><div><strong>{asset.name}</strong><p>{asset.serialNumber} · {asset.location}</p></div><span className={`asset-status ${asset.status.toLowerCase()}`}>{asset.status === 'Available' ? 'Disponible' : 'Mantenimiento'}</span></div>)}</div>
+        </section>
+
+        <section id="reportes" className="panel reports-panel">
+          <div className="panel-heading"><div><p className="eyebrow">CONTROL DEL SERVICIO</p><h2>Reportes rápidos</h2></div><span className="asset-count">Actualizado ahora</span></div>
+          <div className="report-grid"><div><strong>{stats.open}</strong><span>Tickets que requieren atención</span></div><div><strong>{stats.progress}</strong><span>Tickets en trabajo</span></div><div><strong>{assets.filter((asset) => asset.status !== 'Available').length}</strong><span>Activos en mantenimiento</span></div><div><strong>{stats.total ? Math.round((stats.closed / stats.total) * 100) : 0}%</strong><span>Tickets completados</span></div></div>
         </section>
 
         <footer>OpsFlow Platform · Operations workspace · React + Flutter + ASP.NET Core + SQLite</footer>
