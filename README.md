@@ -45,6 +45,8 @@ Then open `http://127.0.0.1:5173/` in a browser.
 
 ## Current status
 
+This is a functional MVP for local demonstration. The API, dashboard, SQLite persistence, tests and first Flutter client are available in the repository. Authentication, production deployment and PostgreSQL are intentionally left for the next stage; they are not presented as completed features.
+
 ## Delivery plan
 
 - [x] Define the first release scope.
