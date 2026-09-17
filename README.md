@@ -1,43 +1,59 @@
 # OpsFlow Platform
 
-> Work in progress
+OpsFlow is a service operations platform for small teams that need to manage incidents, equipment and response times in one place.
 
-OpsFlow is a small service-management platform for organizations that need to control support tickets, equipment and response times in one place.
+This is a portfolio project focused on practical software architecture: a clear domain, a modular backend, a working web dashboard and automated tests. The first release is intentionally small so the design can evolve from a real use case instead of starting with unnecessary microservices.
 
-The project is being built as a portfolio piece to practice complete software design: requirements, architecture, API design, security, testing and documentation.
+## What works today
 
-## Planned modules
+- Create and list support tickets.
+- Validate ticket title and description.
+- Track priority and status (`Open`, `InProgress`, `Resolved`, `Closed`).
+- Filter tickets by status through the API.
+- Update a ticket status from the dashboard.
+- Health endpoint and OpenAPI document.
+- Unit tests for the core ticket workflow.
 
-- Authentication and role-based access.
-- Ticket creation, assignment and status tracking.
-- Equipment and asset inventory.
-- SLA and response-time tracking.
-- Audit history for important changes.
-- Dashboard for supervisors.
-- Flutter app for technicians.
+## Technology
 
-## Planned architecture
+- **Backend:** ASP.NET Core, C# and .NET 9.
+- **Dashboard:** React, Vite and responsive CSS.
+- **Testing:** xUnit.
+- **Planned mobile client:** Flutter and Dart.
+- **Planned persistence:** PostgreSQL.
 
-The first version will use a modular backend with clear boundaries instead of starting with unnecessary microservices.
+## Architecture
 
-- **Mobile:** Flutter and Dart.
-- **Web dashboard:** React and TypeScript.
-- **API:** ASP.NET Core and C#.
-- **Data:** PostgreSQL or Supabase.
-- **Documentation:** OpenAPI, C4 diagrams and architecture decision records.
+The first release is a modular monolith. It keeps deployment and debugging simple while keeping domain boundaries explicit. The main modules are Identity, Tickets, Assets, SLA, Notifications and Audit.
+
+See the [architecture notes](docs/architecture.md) and [roadmap](docs/roadmap.md) for the reasoning behind the design.
+
+## Run the dashboard locally
+
+Start the API and dashboard in separate terminals:
+
+```bash
+dotnet run --project src/OpsFlow.Api/OpsFlow.Api.csproj --urls http://127.0.0.1:5188
+cd src/OpsFlow.Dashboard
+npm install
+npm run dev
+```
+
+Then open `http://127.0.0.1:5173/` in a browser.
 
 ## Current status
+
+## Delivery plan
 
 - [x] Define the first release scope.
 - [x] Document the initial domain and architecture.
 - [x] Create the ASP.NET Core API skeleton.
-- [x] Add a ticket workflow with in-memory storage for the first MVP.
-- [x] Add health check and OpenAPI support.
-- [x] Add automated tests for ticket creation and status changes.
-- [ ] Replace temporary storage with a database.
+- [x] Add the ticket workflow and dashboard.
+- [x] Add automated tests and a CI workflow.
+- [ ] Replace temporary storage with PostgreSQL.
 - [ ] Add authentication and roles.
-- [ ] Connect the Flutter app.
-- [ ] Publish a safe demo without real credentials.
+- [ ] Connect the Flutter technician app.
+- [ ] Deploy a safe public demo with sample data.
 
 ## Run the API
 
@@ -57,6 +73,13 @@ Run the tests with:
 ```bash
 dotnet test OpsFlow.slnx
 ```
+
+## Engineering principles
+
+- Prefer a modular monolith until there is a real reason to split services.
+- Keep business rules testable without the web layer.
+- Make important changes auditable.
+- Never commit credentials or real user information.
 
 ## Repository rules
 

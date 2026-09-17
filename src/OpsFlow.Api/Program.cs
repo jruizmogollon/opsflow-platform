@@ -7,6 +7,9 @@ builder.Services
     .AddControllers()
     .AddJsonOptions(options =>
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.AddCors(options =>
+    options.AddDefaultPolicy(policy =>
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<ITicketStore, InMemoryTicketStore>();
 
@@ -24,6 +27,7 @@ app.MapGet("/health", () => Results.Ok(new
     timestamp = DateTimeOffset.UtcNow
 }));
 
+app.UseCors();
 app.MapControllers();
 
 app.Run();
